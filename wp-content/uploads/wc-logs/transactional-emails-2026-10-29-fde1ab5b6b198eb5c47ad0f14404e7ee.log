@@ -1,0 +1,3 @@
+2026-10-29T17:13:32+00:00 INFO Email "admin_payment_gateway_enabled" sent CONTEXT: {"email_type":"admin_payment_gateway_enabled","status":"sent","recipient":"leafyadmin","WC_Stripe_UPE_Payment_Gateway":null}
+2026-10-29T23:13:29+00:00 INFO Email "customer_new_account" for user #2 sent CONTEXT: {"email_type":"customer_new_account","status":"sent","recipient":"drackamartin2","user":2}
+2026-10-29T23:55:37+00:00 INFO Email "customer_reset_password" for user #2 sent CONTEXT: {"email_type":"customer_reset_password","status":"sent","recipient":"drackamartin2","user":2}

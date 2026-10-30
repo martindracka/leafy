@@ -1,0 +1,16 @@
+# WordPress secrets - contains the database password, never commit this
+wp-config.php
+
+# Local by Flywheel dev-only file
+local-xdebuginfo.php
+
+# Logs, caches, temp upgrade files, backups - not code, can be large/sensitive
+wp-content/debug.log
+wp-content/upgrade/
+wp-content/updraft/
+wp-content/wflogs/
+wp-content/cache/
+
+# OS files
+.DS_Store
+Thumbs.db

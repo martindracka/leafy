@@ -1,0 +1,1234 @@
+/*
+Theme Name: Leafy
+Theme URI: https://brew-haven.local
+Description: Leafy - loose leaf tea e-commerce child theme built on Storefront.
+Author: Leafy
+Template: storefront
+Version: 1.0.4
+Text Domain: leafy
+*/
+
+/* ===================================================================
+   Leafy Design Tokens
+   =================================================================== */
+:root {
+	--leafy-green-dark: #2f4a3c;
+	--leafy-green: #4f7b4a;
+	--leafy-green-light: #a8c9a1;
+	--leafy-brown: #6b4a2f;
+	--leafy-brown-light: #c99a6b;
+	--leafy-gold: #c9a86a;
+	--leafy-cream: #faf6ee;
+	--leafy-cream-dark: #f1e9d8;
+	--leafy-ink: #2b2b24;
+	--leafy-white: #ffffff;
+	--leafy-radius: 14px;
+	--leafy-shadow: 0 6px 24px rgba(43, 43, 36, 0.08);
+}
+
+body {
+	background-color: var(--leafy-cream);
+	color: var(--leafy-ink);
+	font-family: "Jost", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* No sidebar anywhere on this site (see functions.php) - but Storefront's
+   "right-sidebar" body class still reserves ~26% width for the now-empty
+   widget-area column via float. Force the content column back to 100%. */
+.right-sidebar .content-area,
+.left-sidebar .content-area {
+	width: 100% !important;
+	float: none !important;
+	margin-right: 0 !important;
+}
+.right-sidebar .widget-area,
+.left-sidebar .widget-area {
+	display: none !important;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+:focus-visible {
+	outline: 3px solid var(--leafy-gold);
+	outline-offset: 2px;
+}
+
+a {
+	color: var(--leafy-green-dark);
+}
+a:hover { color: var(--leafy-green); }
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: "Playfair Display", Georgia, serif;
+	color: var(--leafy-green-dark);
+	letter-spacing: 0.2px;
+}
+
+.site-branding .leafy-site-title a {
+	display: inline-flex;
+	align-items: center;
+	gap: 14px;
+	text-decoration: none;
+}
+/* Browser default focus outline on this link can render as a harsh
+   purple/blue box (OS accent colour dependent). Override with the
+   brand's own gold focus style instead of dropping it outright. */
+.site-branding .leafy-site-title a:focus {
+	outline: 3px solid var(--leafy-gold);
+	outline-offset: 4px;
+	border-radius: 4px;
+}
+.site-branding .leafy-site-title svg { flex-shrink: 0; }
+.site-branding .leafy-wordmark {
+	font-family: "Playfair Display", Georgia, serif;
+	font-weight: 700;
+	color: var(--leafy-green-dark) !important;
+	font-size: 1.9em;
+	line-height: 1;
+}
+.site-branding .site-description {
+	color: var(--leafy-brown);
+	margin-left: 58px;
+}
+
+/* Without the breadcrumb, page content used to sit flush under the
+   header on every template - give it some breathing room back. */
+#main.site-main {
+	padding-top: 36px;
+}
+
+/* ===================================================================
+   Header / Nav
+   =================================================================== */
+.site-header {
+	background-color: var(--leafy-white);
+	border-bottom: 1px solid var(--leafy-cream-dark);
+	padding-top: 1.2em !important;
+	padding-bottom: 1.2em !important;
+}
+/* Storefront's default column is a fairly narrow ~1065px - on a wide
+   monitor that reads as "not using the width of the page". Widen it
+   everywhere (header, footer, nav, content) to match the rest of the
+   site's 1180px sections. */
+.col-full {
+	max-width: 1180px !important;
+}
+/* The header row is float-based by default, which top-aligns branding
+   and search unevenly whenever the two-line logo block is taller than
+   the single-line search box. Make it a real flex row instead. */
+.site-header > .col-full {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+.site-header > .col-full > .leafy-top-bar {
+	flex: 1 0 100%;
+}
+.site-branding {
+	float: none !important;
+	width: auto !important;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	column-gap: 18px;
+	margin: 10px 0 !important;
+}
+.site-branding .site-description {
+	flex-basis: 100%;
+	margin: 6px 0 0 58px;
+}
+.site-search {
+	float: none !important;
+	width: auto !important;
+	margin-left: auto;
+}
+.site-search .widget { margin: 0; }
+.site-search .woocommerce-product-search {
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: 260px;
+	max-width: 100%;
+}
+.site-search .search-field {
+	width: 100%;
+	border: 1.5px solid var(--leafy-cream-dark);
+	background: var(--leafy-cream);
+	border-radius: 999px;
+	padding: 0.65em 2.8em 0.65em 1.2em;
+	font-family: "Jost", sans-serif;
+	font-size: 0.92em;
+	color: var(--leafy-ink);
+	transition: border-color 0.15s ease, background 0.15s ease;
+}
+.site-search .search-field::placeholder { color: #8a8575; }
+.site-search .search-field:focus {
+	outline: none;
+	border-color: var(--leafy-green);
+	background: var(--leafy-white);
+}
+/* Storefront visually hides this button for a mouse-and-Enter-key search
+   flow (1x1px clipped, screen-reader-only) via a selector that outranks
+   a plain restyle - every clipping/sizing property needs !important to
+   actually bring it back as a visible, clickable icon button. */
+.site-search .woocommerce-product-search button[type="submit"] {
+	position: absolute !important;
+	right: 4px !important;
+	left: auto !important;
+	top: 50% !important;
+	transform: translateY(-50%);
+	width: 34px !important;
+	height: 34px !important;
+	min-width: 34px !important;
+	margin: 0 !important;
+	clip: auto !important;
+	clip-path: none !important;
+	overflow: hidden !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 50%;
+	background: var(--leafy-green-dark) !important;
+	color: #fff !important;
+	font-size: 0;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+.site-search .woocommerce-product-search button[type="submit"]:hover { background: var(--leafy-green) !important; }
+.site-search .woocommerce-product-search button[type="submit"]::before {
+	content: "";
+	width: 15px;
+	height: 15px;
+	background: currentColor;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4.3-4.3'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4.3-4.3'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.main-navigation ul li a {
+	color: var(--leafy-ink);
+	font-weight: 500;
+	text-transform: uppercase;
+	font-size: 0.85em;
+	letter-spacing: 0.06em;
+}
+.main-navigation ul li a:hover,
+.main-navigation .current-menu-item > a {
+	color: var(--leafy-green);
+}
+
+.leafy-top-bar {
+	background: var(--leafy-green-dark);
+	color: var(--leafy-cream);
+	font-size: 0.8em;
+	text-align: center;
+	padding: 8px 12px;
+	letter-spacing: 0.03em;
+}
+.leafy-top-bar a { color: #ffffff; text-decoration: underline; font-weight: 600; }
+
+/* Header cart link ("kr.X 2 items") - add a basket icon so it doesn't
+   read as a stray price floating next to the nav. */
+.cart-contents {
+	display: inline-flex !important;
+	align-items: center;
+	gap: 8px;
+}
+.cart-contents::before {
+	content: "";
+	display: block;
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
+	background-color: var(--leafy-ink);
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 7h15l-1.5 9h-12z'/%3E%3Cpath d='M6 7 5 3H2'/%3E%3Ccircle cx='9' cy='20' r='1'/%3E%3Ccircle cx='18' cy='20' r='1'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 7h15l-1.5 9h-12z'/%3E%3Cpath d='M6 7 5 3H2'/%3E%3Ccircle cx='9' cy='20' r='1'/%3E%3Ccircle cx='18' cy='20' r='1'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Mini-cart dropdown "View cart" / "Checkout" buttons - plain .button
+   links that were rendering nearly invisible (overridden by a
+   higher-specificity default elsewhere); force the brand treatment. */
+.woocommerce-mini-cart__buttons.buttons {
+	display: flex;
+	gap: 10px;
+}
+.woocommerce-mini-cart__buttons.buttons a.button {
+	flex: 1;
+	text-align: center;
+	background-color: var(--leafy-green-dark) !important;
+	border: 2px solid var(--leafy-green-dark) !important;
+	color: #fff !important;
+	border-radius: 999px !important;
+	padding: 0.7em 1em !important;
+	font-size: 0.78em !important;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	text-decoration: none !important;
+}
+.woocommerce-mini-cart__buttons.buttons a.button:hover {
+	background-color: var(--leafy-green) !important;
+}
+.woocommerce-mini-cart__buttons.buttons a.button.checkout {
+	background-color: transparent !important;
+	color: var(--leafy-green-dark) !important;
+}
+.woocommerce-mini-cart__buttons.buttons a.button.checkout:hover {
+	background-color: var(--leafy-green-dark) !important;
+	color: #fff !important;
+}
+
+/* Header account icon - sits just left of the cart icon, same spot
+   on every page. Matches the cart link's vertical rhythm (1.618em
+   top/bottom padding = Storefront's own golden-ratio spacing). */
+.site-header-account {
+	float: right;
+	margin: 0 22px 0 0;
+	list-style: none;
+}
+.site-header-account li {
+	list-style: none;
+}
+.header-account-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.618em 0;
+}
+.header-account-link svg {
+	width: 22px;
+	height: 22px;
+	color: var(--leafy-ink);
+	transition: color 0.15s ease;
+}
+.header-account-link:hover svg {
+	color: var(--leafy-green-dark);
+}
+
+#site-header-cart.site-header-cart .count,
+.site-header-cart .cart-contents .count,
+.site-header-cart .count,
+.storefront-handheld-footer-bar .count,
+.footer-cart-contents .count,
+.count {
+	color: var(--leafy-ink) !important;
+}
+.entry-meta a,
+.entry-meta time,
+.hentry .entry-header .posted-on a,
+.hentry .entry-header .post-author a,
+.hentry .entry-header .post-comments a,
+.hentry .entry-header .byline a,
+.posted-on a,
+.post-author a,
+.post-comments a,
+.cat-links a,
+.tags-links a,
+.widget-area .widget a,
+.widget a,
+.wp-block-archives-list a,
+.wp-block-categories-list a,
+.wp-block-latest-posts__post-title,
+.wp-block-latest-comments__comment-author,
+.wp-block-latest-comments__comment-link,
+.cat-item a,
+.widget_recent_comments a,
+.widget_recent_entries a,
+.widget a[rel="home"],
+.woocommerce-breadcrumb a,
+.product_meta a {
+	color: #595959 !important;
+}
+
+.leafy-lang-switcher {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	margin-left: 16px;
+}
+.leafy-lang-switcher a {
+	color: #ffffff;
+	font-size: 0.8em;
+	text-transform: uppercase;
+	padding: 2px 6px;
+	border-radius: 4px;
+	border: 1px solid rgba(255, 255, 255, 0.6);
+	text-decoration: none;
+}
+.leafy-lang-switcher a.active,
+.leafy-lang-switcher a:hover {
+	background: var(--leafy-gold);
+	color: var(--leafy-ink);
+	border-color: var(--leafy-gold);
+}
+
+/* ===================================================================
+   Buttons
+   =================================================================== */
+.button,
+button,
+input[type="submit"],
+.wp-block-button__link,
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce #respond input#submit,
+.woocommerce-page a.button,
+.woocommerce-page button.button {
+	background-color: var(--leafy-green-dark);
+	border: 2px solid var(--leafy-green-dark);
+	color: #fff !important;
+	border-radius: 999px;
+	padding: calc(0.8em - 2px) 1.8em;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	font-size: 0.78em;
+	transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.button:focus, button:focus, input[type="submit"]:focus,
+.woocommerce a.button:focus, .woocommerce button.button:focus,
+.added_to_cart.wc-forward:focus {
+	outline: 2px solid var(--leafy-gold);
+	outline-offset: 2px;
+}
+.button:hover, button:hover, input[type="submit"]:hover,
+.woocommerce a.button:hover, .woocommerce button.button:hover,
+.woocommerce #respond input#submit:hover {
+	background-color: var(--leafy-green);
+	transform: translateY(-1px);
+}
+.button.alt, .woocommerce a.button.alt, .woocommerce #respond input#submit.alt,
+.woocommerce-page a.button.alt {
+	background-color: var(--leafy-gold);
+	color: var(--leafy-ink) !important;
+}
+.button.alt:hover { background-color: #b8966a; }
+
+/* "View cart" link that WooCommerce adds next to Add to Cart after an
+   AJAX add - style it as a secondary (outline) pill, not WordPress's
+   default black rectangle with a stray border. */
+.added_to_cart.wc-forward {
+	background-color: transparent !important;
+	border: 2px solid var(--leafy-green-dark) !important;
+	color: var(--leafy-green-dark) !important;
+	margin-left: 10px;
+}
+.added_to_cart.wc-forward:hover {
+	background-color: var(--leafy-green-dark) !important;
+	color: #fff !important;
+}
+
+/* ===================================================================
+   WooCommerce account notices (e.g. "temporary password" nag) - the
+   default is a flat blue/green bar with a Font Awesome icon that
+   renders as an empty box once that font is dropped for performance.
+   Restyle on-brand with an inline SVG icon instead. */
+.woocommerce-message,
+.woocommerce-info,
+.woocommerce-error {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	text-align: center;
+	gap: 16px;
+	background-color: var(--leafy-cream-dark) !important;
+	color: var(--leafy-ink) !important;
+	border-left: none !important;
+	border-radius: var(--leafy-radius) !important;
+	padding: 22px 26px !important;
+	margin: 0 0 2em !important;
+	box-shadow: var(--leafy-shadow);
+	list-style: none;
+}
+.woocommerce-error { background-color: #f6e4e1 !important; }
+.woocommerce-message { background-color: #e6f0e1 !important; }
+.woocommerce-message::before,
+.woocommerce-info::before,
+.woocommerce-error::before {
+	font-family: inherit !important;
+	content: "" !important;
+	position: static !important;
+	flex-shrink: 0;
+	width: 22px;
+	height: 22px;
+	background-color: var(--leafy-green-dark);
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 8v5'/%3E%3Ccircle cx='12' cy='16' r='.5' fill='%23000'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 8v5'/%3E%3Ccircle cx='12' cy='16' r='.5' fill='%23000'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.woocommerce-error::before { background-color: #a33c2e; }
+.woocommerce-message::before { background-color: var(--leafy-green-dark); }
+.woocommerce-message a,
+.woocommerce-info a,
+.woocommerce-error a {
+	color: var(--leafy-green-dark) !important;
+}
+.woocommerce-message > *:not(.button),
+.woocommerce-info > *:not(.button),
+.woocommerce-error > *:not(.button) {
+	flex: 0 1 auto;
+	line-height: 1.5;
+}
+.woocommerce-message .button,
+.woocommerce-info .button,
+.woocommerce-error .button {
+	float: none !important;
+	flex-shrink: 0;
+	background-color: var(--leafy-green-dark) !important;
+	color: #fff !important;
+	padding: 0.7em 1.5em !important;
+	border: none !important;
+	border-radius: 999px !important;
+	margin: 0 !important;
+}
+.woocommerce-message .button:hover,
+.woocommerce-info .button:hover,
+.woocommerce-error .button:hover {
+	background-color: var(--leafy-green) !important;
+	color: #fff !important;
+	opacity: 1 !important;
+}
+
+/* ===================================================================
+   Hero / Homepage
+   =================================================================== */
+.leafy-hero {
+	width: auto;
+	margin-left: calc(-50vw + 50%);
+	margin-right: calc(-50vw + 50%);
+}
+.leafy-hero {
+	background: linear-gradient(135deg, var(--leafy-green-dark), var(--leafy-green) 70%);
+	color: #fff;
+	padding: 90px 24px;
+	text-align: center;
+	overflow: hidden;
+}
+.leafy-hero::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 45%),
+	            radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08), transparent 45%);
+}
+.leafy-hero-inner { position: relative; max-width: 680px; margin: 0 auto; }
+.leafy-hero h1 {
+	color: #fff;
+	font-size: 2.6em;
+	margin-bottom: 0.3em;
+}
+.leafy-hero p {
+	font-size: 1.15em;
+	color: var(--leafy-cream);
+	margin-bottom: 1.6em;
+}
+.leafy-hero .button {
+	background-color: var(--leafy-gold);
+	color: var(--leafy-ink) !important;
+}
+
+.leafy-section {
+	max-width: 1180px;
+	margin: 0 auto;
+	padding: 70px 24px;
+}
+.leafy-section-title {
+	text-align: center;
+	margin-bottom: 1.4em;
+}
+.leafy-section-title p {
+	color: var(--leafy-brown);
+	max-width: 560px;
+	margin: 0.4em auto 0;
+}
+
+.leafy-categories-grid {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 18px;
+}
+.leafy-category-card {
+	background: transparent;
+	text-align: center;
+	text-decoration: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	width: 148px;
+	padding: 6px 4px 0;
+	transition: transform 0.2s ease;
+}
+.leafy-category-card:hover { transform: translateY(-3px); }
+.leafy-category-card .icon-badge {
+	width: 72px;
+	height: 72px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: box-shadow 0.2s ease;
+	box-shadow: 0 4px 14px rgba(43, 43, 36, 0.06);
+}
+.leafy-category-card:hover .icon-badge { box-shadow: 0 8px 20px rgba(43, 43, 36, 0.12); }
+.leafy-category-card .icon-badge svg { width: 30px; height: 30px; }
+.leafy-category-card span.name {
+	display: block;
+	font-weight: 600;
+	color: var(--leafy-ink);
+	text-transform: uppercase;
+	font-size: 0.8em;
+	letter-spacing: 0.05em;
+}
+/* Per-category palette, echoing each category's product photography */
+.cat-green .icon-badge   { background: #e6f0e1; color: #3f6b3a; }
+.cat-black .icon-badge   { background: #f1e6da; color: #5a3a26; }
+.cat-fruit .icon-badge   { background: #fbe3e3; color: #8e2f3c; }
+.cat-herbal .icon-badge  { background: #faf0d9; color: #8a6a1f; }
+.cat-gift .icon-badge    { background: #f7ecd3; color: #9c7a3c; }
+.cat-accessories .icon-badge { background: #e1eeee; color: #2f5c5c; }
+
+.leafy-values-bar {
+	background: var(--leafy-cream-dark);
+	border-radius: var(--leafy-radius);
+	padding: 44px 32px;
+	max-width: 1180px;
+	margin: 0 auto 70px;
+}
+.leafy-values-grid {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 32px 40px;
+	text-align: center;
+}
+.leafy-value-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 190px;
+}
+.leafy-value-item .icon-badge {
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	background: var(--leafy-white);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--leafy-green-dark);
+	margin-bottom: 12px;
+	box-shadow: 0 3px 10px rgba(43, 43, 36, 0.07);
+}
+.leafy-value-item .icon-badge svg { width: 24px; height: 24px; }
+.leafy-value-item strong { display: block; color: var(--leafy-green-dark); font-size: 0.95em; }
+.leafy-value-item span { font-size: 0.82em; color: var(--leafy-brown); margin-top: 2px; }
+
+.leafy-newsletter {
+	background: var(--leafy-green-dark);
+	color: #fff;
+	border-radius: var(--leafy-radius);
+	padding: 50px 30px;
+	text-align: center;
+	max-width: 1180px;
+	margin: 0 auto 70px;
+}
+.leafy-newsletter h2 { color: #fff; }
+.leafy-newsletter p { color: var(--leafy-cream); margin-bottom: 1.4em; }
+.leafy-newsletter-form {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	max-width: 440px;
+	margin: 0 auto;
+}
+.leafy-newsletter-form input[type="email"] {
+	padding: 0.8em 1.2em;
+	border-radius: 999px;
+	border: none;
+	flex: 1;
+	min-width: 220px;
+}
+.leafy-newsletter-form .button { white-space: nowrap; }
+.leafy-newsletter .coupon-note { margin-top: 1em; font-size: 0.85em; color: #e3c892; font-weight: 600; }
+
+.leafy-video-wrap {
+	position: relative;
+	width: 100%;
+	max-width: 900px;
+	margin: 0 auto 2em;
+	aspect-ratio: 16 / 9;
+	border-radius: var(--leafy-radius);
+	overflow: hidden;
+	box-shadow: var(--leafy-shadow);
+	background: #000;
+}
+.leafy-video-wrap iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+.leafy-video-facade {
+	position: relative;
+	display: block;
+	width: 100%;
+	max-width: 900px;
+	aspect-ratio: 16 / 9;
+	margin: 0 auto 2em;
+	border-radius: var(--leafy-radius);
+	overflow: hidden;
+	box-shadow: var(--leafy-shadow);
+	background: #000;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+}
+.leafy-video-facade img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	opacity: 0.85;
+}
+.leafy-video-play {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 76px;
+	height: 76px;
+	border-radius: 50%;
+	background: rgba(207, 36, 36, 0.92);
+	color: #fff;
+	font-size: 1.6em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding-left: 6px;
+	transition: transform 0.2s ease, background 0.2s ease;
+}
+.leafy-video-facade:hover .leafy-video-play {
+	background: var(--leafy-green-dark);
+	transform: translate(-50%, -50%) scale(1.08);
+}
+
+.leafy-photo-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin: 2em 0;
+}
+.leafy-photo-grid img {
+	width: 100%;
+	height: 220px;
+	object-fit: cover;
+	border-radius: var(--leafy-radius);
+	box-shadow: var(--leafy-shadow);
+}
+@media (max-width: 640px) {
+	.leafy-photo-grid { grid-template-columns: 1fr; }
+}
+
+.leafy-testimonials-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 24px;
+}
+.leafy-testimonial-card {
+	background: var(--leafy-white);
+	border-radius: var(--leafy-radius);
+	box-shadow: var(--leafy-shadow);
+	padding: 28px 24px;
+	margin: 0;
+	text-align: center;
+}
+.leafy-testimonial-card img {
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin: 0 auto 14px;
+	display: block;
+}
+.leafy-testimonial-card blockquote {
+	margin: 0 0 14px;
+	font-style: italic;
+	color: var(--leafy-ink);
+	line-height: 1.6;
+}
+.leafy-testimonial-card figcaption {
+	font-weight: 600;
+	color: var(--leafy-green-dark);
+	text-transform: uppercase;
+	font-size: 0.8em;
+	letter-spacing: 0.04em;
+}
+
+.leafy-blog-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 24px;
+}
+.leafy-blog-card {
+	background: var(--leafy-white);
+	border-radius: var(--leafy-radius);
+	overflow: hidden;
+	box-shadow: var(--leafy-shadow);
+	display: flex;
+	flex-direction: column;
+}
+.leafy-blog-card .blog-card-body { padding: 20px; }
+.leafy-blog-card h3 { font-size: 1.1em; margin-top: 0; }
+.leafy-blog-card a.read-more { font-size: 0.85em; font-weight: 600; text-transform: uppercase; }
+
+/* ===================================================================
+   WooCommerce: Shop / Archive
+   =================================================================== */
+.woocommerce ul.products li.product {
+	background: var(--leafy-white);
+	border-radius: var(--leafy-radius);
+	padding: 14px 14px 20px;
+	box-shadow: var(--leafy-shadow);
+	transition: transform 0.2s ease;
+}
+.woocommerce ul.products li.product:hover { transform: translateY(-3px); }
+.woocommerce ul.products li.product img {
+	border-radius: calc(var(--leafy-radius) - 6px);
+}
+.woocommerce ul.products li.product .price {
+	color: var(--leafy-brown);
+	font-weight: 700;
+}
+.woocommerce ul.products li.product h2,
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+	font-family: "Jost", sans-serif;
+	font-size: 1em;
+	font-weight: 600;
+	color: var(--leafy-ink);
+}
+.woocommerce span.onsale {
+	background: var(--leafy-gold);
+	color: var(--leafy-ink);
+	font-weight: 700;
+}
+.woocommerce-page .woocommerce-breadcrumb {
+	color: var(--leafy-brown);
+	margin-bottom: 2em;
+}
+.woocommerce-page .woocommerce-breadcrumb a { color: var(--leafy-green-dark); }
+
+.woocommerce-page select {
+	border-radius: 8px;
+	border: 1px solid var(--leafy-cream-dark);
+}
+
+/* Top sort/filter bar: minimal - no card, no shadow, just a clean row
+   with a custom-styled native <select> (own chevron, no browser
+   default arrow) and the result count opposite it. */
+.storefront-sorting:has(.woocommerce-ordering) {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 14px;
+	padding-bottom: 14px;
+	margin-bottom: 2.5em;
+	border-bottom: 1px solid var(--leafy-cream-dark);
+}
+.storefront-sorting .woocommerce-ordering {
+	float: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.storefront-sorting .woocommerce-ordering::before {
+	content: "Sort by";
+	font-size: 0.78em;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--leafy-brown);
+	white-space: nowrap;
+}
+.woocommerce .woocommerce-ordering select {
+	appearance: none;
+	-webkit-appearance: none;
+	border: none;
+	border-bottom: 1.5px solid var(--leafy-green-dark);
+	border-radius: 0;
+	background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f4a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 2px center / 13px;
+	padding: 0.3em 1.6em 0.3em 0.1em;
+	font-family: "Jost", sans-serif;
+	font-size: 0.9em;
+	font-weight: 600;
+	color: var(--leafy-ink);
+	cursor: pointer;
+	transition: border-color 0.15s ease;
+}
+.woocommerce .woocommerce-ordering select:hover,
+.woocommerce .woocommerce-ordering select:focus {
+	outline: none;
+	border-bottom-color: var(--leafy-gold);
+}
+.storefront-sorting .woocommerce-result-count {
+	float: none;
+	margin: 0;
+	padding: 0;
+	font-size: 0.85em;
+	color: var(--leafy-brown);
+}
+
+/* The bottom sort/filter bar now holds only pagination (the ordering
+   dropdown + result count are kept to the top bar only) - center it
+   instead of leaving it float:right from Storefront's default. */
+.storefront-sorting:has(.woocommerce-pagination):not(:has(.woocommerce-ordering)) {
+	display: flex;
+	justify-content: center;
+	margin-top: 2.5em;
+}
+.storefront-sorting:has(.woocommerce-pagination):not(:has(.woocommerce-ordering)) .woocommerce-pagination {
+	float: none;
+}
+.woocommerce-pagination .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.woocommerce-pagination .page-numbers li { display: inline-block; line-height: 0; }
+.woocommerce-pagination .page-numbers .page-numbers {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	background: var(--leafy-white);
+	border: 1px solid var(--leafy-cream-dark);
+	color: var(--leafy-ink);
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 0.9em;
+	line-height: 1;
+}
+.woocommerce-pagination .page-numbers a.page-numbers:hover {
+	background: var(--leafy-green-dark);
+	border-color: var(--leafy-green-dark);
+	color: #fff;
+}
+.woocommerce-pagination .page-numbers .page-numbers.current {
+	background: var(--leafy-green-dark);
+	border-color: var(--leafy-green-dark);
+	color: #fff;
+}
+/* The default prev/next links are plain "←"/"→" text glyphs, which
+   render at inconsistent widths and break the circle - swap them for
+   a sized SVG chevron instead. */
+.woocommerce-pagination .page-numbers .next.page-numbers,
+.woocommerce-pagination .page-numbers .prev.page-numbers {
+	font-size: 0;
+}
+.woocommerce-pagination .page-numbers .next.page-numbers::before,
+.woocommerce-pagination .page-numbers .prev.page-numbers::before {
+	content: "";
+	display: block;
+	width: 14px;
+	height: 14px;
+	background-color: currentColor;
+}
+.woocommerce-pagination .page-numbers .next.page-numbers::before {
+	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E");
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E");
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+}
+.woocommerce-pagination .page-numbers .prev.page-numbers::before {
+	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E");
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E");
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+}
+
+/* Storefront's default muted meta-text grey (#727272 on our cream bg) sits
+   just under the WCAG AA 4.5:1 threshold - darken it everywhere it's used:
+   post date/author/comments meta, category & tag links, and the default
+   sidebar widgets (recent posts/comments, archives, categories). */
+.entry-meta a,
+.entry-meta time,
+.posted-on a,
+.post-author a,
+.post-comments a,
+.cat-links a,
+.tags-links a,
+.widget a,
+.wp-block-archives-list a,
+.wp-block-categories-list a,
+.wp-block-latest-posts__post-title,
+.wp-block-latest-comments__comment-author,
+.wp-block-latest-comments__comment-link,
+.cat-item a {
+	color: #595959;
+}
+.entry-meta a:hover,
+.cat-links a:hover,
+.tags-links a:hover,
+.widget a:hover {
+	color: var(--leafy-green-dark);
+}
+
+.woocommerce div.product p.stock {
+	color: #0a5c36;
+}
+.woocommerce span.posted_in a {
+	color: #595959;
+}
+
+.leafy-shop-header {
+	background: var(--leafy-cream-dark);
+	padding: 50px 24px;
+	text-align: center;
+	margin: -1px -1px 40px;
+}
+.leafy-shop-header h1 { margin-bottom: 0.2em; }
+.leafy-shop-header p { color: var(--leafy-brown); }
+
+/* ===================================================================
+   WooCommerce: Single Product
+   =================================================================== */
+.woocommerce div.product .product_title {
+	font-size: 2em;
+}
+.woocommerce div.product p.price,
+.woocommerce div.product span.price {
+	color: var(--leafy-brown);
+	font-size: 1.5em;
+	font-weight: 700;
+}
+.woocommerce div.product .woocommerce-product-details__short-description {
+	color: #4a4a40;
+}
+.woocommerce div.product form.cart .button {
+	padding: 1em 2.4em;
+}
+.woocommerce-tabs ul.tabs li { text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.04em; }
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active a { color: var(--leafy-green-dark); }
+.woocommerce #reviews #comments ol.commentlist li .comment-text { border-radius: var(--leafy-radius); }
+
+/* related / upsell */
+.woocommerce .related.products h2,
+.woocommerce .upsells.products h2 {
+	text-align: center;
+}
+
+/* ===================================================================
+   WooCommerce: Cart (block-based cart - different markup/classes to
+   the classic shop_table styling below, which no longer renders here)
+   =================================================================== */
+.wc-block-cart-item__remove-link {
+	color: var(--leafy-ink) !important;
+	opacity: 0.55;
+	transition: opacity 0.15s ease, color 0.15s ease;
+}
+.wc-block-cart-item__remove-link:hover {
+	color: #a33c2e !important;
+	opacity: 1;
+}
+.wc-block-cart__submit-button.wc-block-components-button {
+	background-color: var(--leafy-green-dark) !important;
+	border: none !important;
+	border-radius: 999px !important;
+	color: #fff !important;
+	font-family: "Jost", sans-serif;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	font-size: 0.85em;
+	padding: 1em 1.6em !important;
+	text-decoration: none !important;
+	transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.wc-block-cart__submit-button.wc-block-components-button:hover {
+	background-color: var(--leafy-green) !important;
+	transform: translateY(-1px);
+}
+.wc-block-cart__submit-button .wc-block-components-button__text {
+	text-decoration: none !important;
+}
+
+/* ===================================================================
+   WooCommerce: Cart
+   =================================================================== */
+.woocommerce table.shop_table {
+	border: none;
+	border-radius: var(--leafy-radius);
+	overflow: hidden;
+	box-shadow: var(--leafy-shadow);
+}
+.woocommerce table.shop_table th {
+	background: var(--leafy-green-dark);
+	color: #fff;
+	text-transform: uppercase;
+	font-size: 0.78em;
+	letter-spacing: 0.04em;
+}
+.woocommerce table.shop_table td { background: var(--leafy-white); }
+.woocommerce .cart-collaterals .cart_totals {
+	background: var(--leafy-cream-dark);
+	border-radius: var(--leafy-radius);
+	padding: 24px;
+}
+.woocommerce .cart-collaterals .cart_totals h2 { margin-top: 0; }
+.woocommerce-cart .coupon input#coupon_code {
+	border-radius: 999px;
+	padding: 0.7em 1.2em;
+}
+
+/* ===================================================================
+   WooCommerce: Checkout
+   =================================================================== */
+.woocommerce-checkout #payment {
+	background: var(--leafy-cream-dark) !important;
+	border-radius: var(--leafy-radius);
+}
+.woocommerce-checkout #payment div.payment_box {
+	background: var(--leafy-white) !important;
+	border-radius: 10px;
+}
+.woocommerce-checkout #payment div.payment_box::before {
+	border-bottom-color: var(--leafy-white) !important;
+}
+.woocommerce-billing-fields input, .woocommerce-shipping-fields input,
+.woocommerce-additional-fields input, .woocommerce form .form-row select,
+.woocommerce-checkout textarea {
+	border-radius: 8px;
+	border: 1px solid var(--leafy-cream-dark);
+}
+#order_review_heading, #order_review {
+	background: var(--leafy-cream-dark);
+	padding: 20px;
+	border-radius: var(--leafy-radius);
+}
+
+/* ===================================================================
+   WooCommerce: My Account
+   =================================================================== */
+.woocommerce-account .woocommerce-MyAccount-navigation {
+	background: var(--leafy-white);
+	border-radius: var(--leafy-radius);
+	padding: 10px 0;
+	box-shadow: var(--leafy-shadow);
+}
+.woocommerce-account .woocommerce-MyAccount-navigation ul li {
+	border-bottom: 1px solid var(--leafy-cream-dark);
+}
+.woocommerce-account .woocommerce-MyAccount-navigation ul li a {
+	padding: 12px 20px;
+	display: block;
+	text-align: center;
+	color: var(--leafy-ink);
+	text-transform: none;
+	font-size: 0.95em;
+	letter-spacing: normal;
+}
+.woocommerce-account .woocommerce-MyAccount-navigation ul li.is-active a,
+.woocommerce-account .woocommerce-MyAccount-navigation ul li a:hover {
+	color: var(--leafy-green-dark);
+	font-weight: 700;
+}
+.woocommerce-MyAccount-content {
+	background: var(--leafy-white);
+	border-radius: var(--leafy-radius);
+	padding: 28px;
+	box-shadow: var(--leafy-shadow);
+}
+
+/* ===================================================================
+   Footer
+   =================================================================== */
+#colophon,
+.site-footer {
+	background: var(--leafy-green-dark);
+	color: #ffffff;
+}
+.site-footer p,
+.site-footer span,
+.site-footer li {
+	color: #ffffff;
+}
+/* #colophon (ID) is needed to outrank WordPress's injected global-styles
+   rule ".site-footer a:not(.button):not(.components-button)", which beats
+   a plain ".site-footer a" on specificity regardless of load order. */
+#colophon.site-footer a,
+#colophon a {
+	color: #ffffff;
+	text-decoration: underline;
+	text-decoration-color: rgba(255, 255, 255, 0.5);
+	text-underline-offset: 2px;
+}
+#colophon.site-footer a:hover,
+#colophon a:hover {
+	color: var(--leafy-gold);
+	text-decoration-color: var(--leafy-gold);
+}
+.leafy-footer-widgets {
+	max-width: 1180px;
+	margin: 0 auto;
+	padding: 50px 24px 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 30px;
+}
+.leafy-footer-widgets h3 { color: #ffffff; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em; }
+.leafy-footer-badge { margin-bottom: 16px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18)); }
+.leafy-footer-widgets p { color: #ffffff; opacity: 0.92; }
+#colophon .leafy-footer-social a,
+.leafy-footer-social a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px; height: 36px;
+	border: 1px solid rgba(255,255,255,0.3);
+	border-radius: 50%;
+	margin-right: 8px;
+	color: #fff;
+	text-decoration: none;
+}
+.leafy-footer-social a:hover { background: var(--leafy-gold); border-color: var(--leafy-gold); color: var(--leafy-ink); }
+.leafy-footer-bottom {
+	text-align: center;
+	padding: 18px;
+	font-size: 0.8em;
+	border-top: 1px solid rgba(255,255,255,0.12);
+	color: rgba(255,255,255,0.7);
+}
+.leafy-payment-icons { margin-top: 10px; font-size: 0.78em; letter-spacing: 0.05em; color: rgba(255,255,255,0.65); }
+
+@media (max-width: 768px) {
+	.leafy-hero { padding: 60px 20px; }
+	.leafy-hero h1 { font-size: 1.9em; }
+	.leafy-section { padding: 48px 18px; }
+}

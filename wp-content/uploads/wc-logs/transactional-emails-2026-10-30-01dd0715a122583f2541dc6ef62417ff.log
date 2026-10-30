@@ -1,0 +1,3 @@
+2026-10-30T00:05:13+00:00 INFO Email "customer_new_account" for user #3 sent CONTEXT: {"email_type":"customer_new_account","status":"sent","recipient":"pracovnozaneprazdneny","user":3}
+2026-10-30T00:05:23+00:00 INFO Email "customer_reset_password" for user #3 sent CONTEXT: {"email_type":"customer_reset_password","status":"sent","recipient":"pracovnozaneprazdneny","user":3}
+2026-10-30T00:08:38+00:00 INFO Email "customer_reset_password" for user #3 sent CONTEXT: {"email_type":"customer_reset_password","status":"sent","recipient":"pracovnozaneprazdneny","user":3}
